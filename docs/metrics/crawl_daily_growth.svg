@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+<rect width="100%" height="100%" fill="#f7f7f2"/>
+<text x="60" y="54" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700" fill="#202126">ExplainRx crawl growth</text>
+<text x="60" y="82" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#70757a">Daily relationship count and daily positive relationship gain, generated from crawl_health_history.log</text>
+<rect x="88" y="118" width="1070" height="214" fill="#ffffff" rx="10"/>
+<rect x="88" y="424" width="1070" height="228" fill="#ffffff" rx="10"/>
+<text x="88" y="100" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">End-of-day relationships</text>
+<text x="88" y="406" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">Daily positive relationship gain</text>
+<line x1="88" y1="332.4" x2="1158" y2="332.4" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="337.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">6.0M</text>
+<line x1="88" y1="288.4" x2="1158" y2="288.4" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="293.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">8.0M</text>
+<line x1="88" y1="244.4" x2="1158" y2="244.4" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="249.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">10.0M</text>
+<line x1="88" y1="200.4" x2="1158" y2="200.4" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="205.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">12.0M</text>
+<line x1="88" y1="156.4" x2="1158" y2="156.4" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="161.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">14.0M</text>
+<line x1="88" y1="112.4" x2="1158" y2="112.4" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="117.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">16.0M</text>
+<line x1="88" y1="652.0" x2="1158" y2="652.0" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="657.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">0</text>
+<line x1="88" y1="541.7" x2="1158" y2="541.7" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="546.7" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">2.0M</text>
+<line x1="88" y1="431.3" x2="1158" y2="431.3" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="436.3" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">4.0M</text>
+<line x1="88" y1="321.0" x2="1158" y2="321.0" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="326.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">6.0M</text>
+<path d="M 88.0 332.0 L 195.0 241.1 L 302.0 159.4 L 409.0 154.4 L 516.0 152.2 L 623.0 148.0 L 730.0 135.4 L 837.0 128.7 L 944.0 131.2 L 1051.0 118.9 L 1158.0 118.0" fill="none" stroke="#1f4e79" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="88.0" cy="332.0" r="5" fill="#1f4e79"/>
+<circle cx="195.0" cy="241.1" r="5" fill="#1f4e79"/>
+<circle cx="302.0" cy="159.4" r="5" fill="#1f4e79"/>
+<circle cx="409.0" cy="154.4" r="5" fill="#1f4e79"/>
+<circle cx="516.0" cy="152.2" r="5" fill="#1f4e79"/>
+<circle cx="623.0" cy="148.0" r="5" fill="#1f4e79"/>
+<circle cx="730.0" cy="135.4" r="5" fill="#1f4e79"/>
+<circle cx="837.0" cy="128.7" r="5" fill="#1f4e79"/>
+<circle cx="944.0" cy="131.2" r="5" fill="#1f4e79"/>
+<circle cx="1051.0" cy="118.9" r="5" fill="#1f4e79"/>
+<circle cx="1158.0" cy="118.0" r="7" fill="#1f4e79"/>
+<text x="1168.0" y="108.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1f4e79">15,744,850</text>
+<rect x="71.0" y="583.8" width="34" height="68.2" rx="4" fill="#2a9d8f"/>
+<rect x="178.0" y="424.0" width="34" height="228.0" rx="4" fill="#2a9d8f"/>
+<rect x="285.0" y="447.5" width="34" height="204.5" rx="4" fill="#2a9d8f"/>
+<rect x="392.0" y="639.5" width="34" height="12.5" rx="4" fill="#2a9d8f"/>
+<rect x="499.0" y="646.5" width="34" height="5.5" rx="4" fill="#2a9d8f"/>
+<rect x="606.0" y="641.8" width="34" height="10.2" rx="4" fill="#2a9d8f"/>
+<rect x="713.0" y="620.3" width="34" height="31.7" rx="4" fill="#2a9d8f"/>
+<rect x="820.0" y="633.0" width="34" height="19.0" rx="4" fill="#2a9d8f"/>
+<circle cx="837.0" cy="623.0" r="5" fill="#b3472c"/>
+<rect x="927.0" y="631.4" width="34" height="20.6" rx="4" fill="#2a9d8f"/>
+<circle cx="944.0" cy="621.4" r="5" fill="#b3472c"/>
+<rect x="1034.0" y="649.6" width="34" height="2.4" rx="4" fill="#2a9d8f"/>
+<circle cx="1051.0" cy="639.6" r="5" fill="#b3472c"/>
+<rect x="1141.0" y="649.9" width="34" height="2.1" rx="4" fill="#2a9d8f"/>
+<circle cx="1158.0" cy="639.9" r="5" fill="#b3472c"/>
+<text x="88.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-16</text>
+<text x="195.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-17</text>
+<text x="302.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-18</text>
+<text x="409.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-19</text>
+<text x="516.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-21</text>
+<text x="623.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-22</text>
+<text x="730.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-23</text>
+<text x="837.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-24</text>
+<text x="944.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-25</text>
+<text x="1051.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-29</text>
+<text x="1158.0" y="676" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">06-30</text>
+<rect x="864" y="78" width="276" height="106" rx="12" fill="#ffffff" stroke="#d8ddd2"/>
+<text x="882" y="106" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#202126">Latest day: 2026-06-30</text>
+<text x="882" y="132" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#202126">Relationships: 15,744,850</text>
+<text x="882" y="154" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#202126">Positive gain: 38,160</text>
+<text x="882" y="176" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#202126">Pending queue: 39,384</text>
+<line x1="60" y1="732" x2="84" y2="732" stroke="#1f4e79" stroke-width="4"/>
+<text x="94" y="737" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">End-of-day relationship count</text>
+<rect x="332" y="721" width="20" height="20" rx="4" fill="#2a9d8f"/>
+<text x="362" y="737" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">Daily positive gain</text>
+<circle cx="560" cy="731" r="5" fill="#b3472c"/>
+<text x="574" y="737" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">Day includes relationship-count drops/resets</text>
+</svg>
