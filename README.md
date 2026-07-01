@@ -16,4 +16,4 @@ Panel files:
 ## Crawl progress
 
 
-Latest daily summary: [docs/metrics/crawl_daily_summary.md](docs/metrics/crawl_daily_summary.md)
+Latest daily summary: [docs/metrics/crawl_daily_growth.svg](docs/metrics/crawl_daily_summary.md)
