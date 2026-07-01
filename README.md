@@ -2,9 +2,9 @@
 
 Minimal public snapshot of ExplainRx KB expansion progress.
 
-[Open the full combined plot](docs/metrics/crawl_daily_growth.png)
+[Open the full combined plot](docs/metrics/crawl_daily_growth.svg)
 
-![ExplainRx crawl growth](docs/metrics/crawl_daily_growth.png)
+![ExplainRx crawl growth](docs/metrics/crawl_daily_growth.svg)
 
 Panel files:
 [Edges in KB](docs/metrics/crawl_panel_edges.png) ·
@@ -15,5 +15,3 @@ Panel files:
 
 ## Crawl progress
 
-
-Latest daily summary: [docs/metrics/crawl_daily_growth.svg](docs/metrics/crawl_daily_summary.md)
