@@ -38,6 +38,10 @@ DEFAULT_SUMMARY_MD = os.environ.get(
     "EXPLAINRX_DAILY_SUMMARY_MD",
     str(DEFAULT_DIR.parent / "docs" / "metrics" / "crawl_daily_summary.md"),
 )
+DEFAULT_PLOT_START_DATE = os.environ.get(
+    "EXPLAINRX_DAILY_PLOT_START_DATE",
+    "2026-06-24",
+)
 
 
 def _as_int(value: str):
@@ -246,23 +250,48 @@ def _fmt_delta(value: object) -> str:
     return "—"
 
 
-def write_summary_md(rows: List[Dict[str, object]], out_path: Path, recent_days: int = 7) -> None:
+def _filter_display_rows(rows: List[Dict[str, object]], start_date: Optional[str]) -> List[Dict[str, object]]:
+    start_raw = str(start_date or "").strip()
+    if not start_raw:
+        return rows
+    try:
+        start = dt.date.fromisoformat(start_raw)
+    except ValueError:
+        return rows
+    out: List[Dict[str, object]] = []
+    for row in rows:
+        try:
+            row_day = dt.date.fromisoformat(str(row["date"]))
+        except ValueError:
+            continue
+        if row_day >= start:
+            out.append(row)
+    return out
+
+
+def write_summary_md(
+    rows: List[Dict[str, object]],
+    out_path: Path,
+    recent_days: int = 7,
+    start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
+) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    if not rows:
+    display_rows = _filter_display_rows(rows, start_date)
+    if not display_rows:
         out_path.write_text(
             "# ExplainRx crawl daily summary\n\n"
-            "No daily crawl history is available yet.\n"
+            f"No daily crawl history is available on or after `{start_date}`.\n"
         )
         return
 
-    latest = rows[-1]
+    latest = display_rows[-1]
     latest_date = str(latest["date"])
     first_at = str(latest.get("first_snapshot_at", "—"))
     last_at = str(latest.get("last_snapshot_at", "—"))
     snapshot_count = latest.get("snapshot_count")
     drop_events = int(latest.get("relationship_drop_events", 0) or 0)
 
-    recent = rows[-recent_days:]
+    recent = display_rows[-recent_days:]
     table_lines = [
         "| Date | Edges in KB | Positive gain | Entities in KB | Done | Pending | Notes |",
         "|---|---:|---:|---:|---:|---:|---|",
@@ -294,6 +323,8 @@ def write_summary_md(rows: List[Dict[str, object]], out_path: Path, recent_days:
             "",
             "![ExplainRx crawl growth](crawl_daily_growth.svg)",
             "",
+            f"Display baseline: **{start_date} onward**. Earlier days are excluded because they used older ingestion rules.",
+            "",
             "## Latest day",
             "",
             f"- Snapshot window: `{first_at}` to `{last_at}` local (`{snapshot_count}` snapshots)",
@@ -313,7 +344,11 @@ def write_summary_md(rows: List[Dict[str, object]], out_path: Path, recent_days:
     out_path.write_text(md)
 
 
-def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
+def write_growth_svg(
+    rows: List[Dict[str, object]],
+    out_path: Path,
+    start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
+) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     width = 1200
     height = 1664
@@ -342,22 +377,24 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
     ent_color = "#a6611a"
     tot_color = "#2f6b3c"
 
-    if not rows:
+    display_rows = _filter_display_rows(rows, start_date)
+
+    if not display_rows:
         svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
   <rect width="100%" height="100%" fill="{bg}"/>
   <text x="60" y="90" font-family="Helvetica, Arial, sans-serif" font-size="28" fill="{ink}">ExplainRx crawl growth</text>
-  <text x="60" y="136" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="{muted}">No daily crawl history is available yet.</text>
+  <text x="60" y="136" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="{muted}">No daily crawl history is available on or after {html.escape(str(start_date))}.</text>
 </svg>
 """
         out_path.write_text(svg)
         return
 
-    labels = [str(r["date"])[5:] for r in rows]
-    counts = [int(r["end_relationships"]) for r in rows if isinstance(r.get("end_relationships"), int)]
-    gains = [int(r["positive_relationship_gain"]) for r in rows if isinstance(r.get("positive_relationship_gain"), int)]
-    line_values = [int(r.get("end_relationships", 0) or 0) for r in rows]
-    gain_values = [int(r.get("positive_relationship_gain", 0) or 0) for r in rows]
-    latest = rows[-1]
+    labels = [str(r["date"])[5:] for r in display_rows]
+    counts = [int(r["end_relationships"]) for r in display_rows if isinstance(r.get("end_relationships"), int)]
+    gains = [int(r["positive_relationship_gain"]) for r in display_rows if isinstance(r.get("positive_relationship_gain"), int)]
+    line_values = [int(r.get("end_relationships", 0) or 0) for r in display_rows]
+    gain_values = [int(r.get("positive_relationship_gain", 0) or 0) for r in display_rows]
+    latest = display_rows[-1]
 
     line_min = min(line_values)
     line_max = max(line_values)
@@ -370,7 +407,7 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
     if gain_max == 0:
         gain_max = 1
 
-    pending_values = [int(r.get("end_pending", 0) or 0) for r in rows]
+    pending_values = [int(r.get("end_pending", 0) or 0) for r in display_rows]
     pending_min = min(pending_values) if pending_values else 0
     pending_max = max(pending_values) if pending_values else 1
     if pending_min == pending_max:
@@ -381,7 +418,7 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
     # (status='done'). This is the end-of-day `done` count, available for every
     # day; it can dip when the queue is re-seeded, which is expected.
     ent_indexed = [(i, int(r["end_done"]))
-                   for i, r in enumerate(rows)
+                   for i, r in enumerate(display_rows)
                    if isinstance(r.get("end_done"), int)]
     ent_vals = [v for _, v in ent_indexed]
     ent_min = min(ent_vals) if ent_vals else 0
@@ -393,7 +430,7 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
     # Total entities in the KB (ent=). Only logged on recent days, so keep just
     # the days that have it; the panel fills in as more days are recorded.
     tot_indexed = [(i, int(r["end_entities"]))
-                   for i, r in enumerate(rows)
+                   for i, r in enumerate(display_rows)
                    if isinstance(r.get("end_entities"), int)]
     tot_vals = [v for _, v in tot_indexed]
     tot_min = min(tot_vals) if tot_vals else 0
@@ -403,18 +440,18 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
         tot_max = tot_max + 1
 
     xs = []
-    if len(rows) == 1:
+    if len(display_rows) == 1:
         xs = [left + plot_width / 2]
     else:
-        for idx in range(len(rows)):
-            xs.append(left + (plot_width * idx / (len(rows) - 1)))
+        for idx in range(len(display_rows)):
+            xs.append(left + (plot_width * idx / (len(display_rows) - 1)))
 
     line_points = []
     for x, value in zip(xs, line_values):
         y = _scale(value, line_min, line_max, line_bottom, line_top)
         line_points.append((x, y))
 
-    bar_width = min(34, max(10, int(plot_width / max(len(rows) * 1.8, 1))))
+    bar_width = min(34, max(10, int(plot_width / max(len(display_rows) * 1.8, 1))))
     line_tick_vals = _ticks(line_min, line_max, 5)
     gain_tick_vals = _ticks(gain_min, gain_max, 4)
     pending_tick_vals = _ticks(pending_min, pending_max, 5)
@@ -436,7 +473,7 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         f'<rect width="100%" height="100%" fill="{bg}"/>',
         f'<text x="60" y="{top_title}" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700" fill="{ink}">ExplainRx crawl growth</text>',
-        f'<text x="60" y="{top_title + 28}" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="{muted}">Daily relationship count and daily positive relationship gain, generated from crawl_health_history.log</text>',
+        f'<text x="60" y="{top_title + 28}" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="{muted}">Daily relationship count and daily positive relationship gain, starting {html.escape(str(start_date))} because earlier days used older ingestion rules</text>',
         f'<rect x="{left}" y="{line_top}" width="{plot_width}" height="{line_bottom - line_top}" fill="#ffffff" rx="10"/>',
         f'<rect x="{left}" y="{bar_top}" width="{plot_width}" height="{bar_bottom - bar_top}" fill="#ffffff" rx="10"/>',
         f'<rect x="{left}" y="{pending_top}" width="{plot_width}" height="{pending_bottom - pending_top}" fill="#ffffff" rx="10"/>',
@@ -487,7 +524,7 @@ def write_growth_svg(rows: List[Dict[str, object]], out_path: Path) -> None:
             parts.append(f'<text x="{x + 10:.1f}" y="{y - 10:.1f}" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="{count_color}">{html.escape(f"{value:,}")}</text>')
 
     # Bar plot
-    for x, value, row in zip(xs, gain_values, rows):
+    for x, value, row in zip(xs, gain_values, display_rows):
         y = _scale(value, gain_min, gain_max, bar_bottom, bar_top)
         height_px = max(0, bar_bottom - y)
         bar_x = x - bar_width / 2
@@ -591,6 +628,7 @@ def write_daily_rollup(
     out_path: Path,
     svg_path: Optional[Path] = DEFAULT_SVG,
     summary_md_path: Optional[Path] = DEFAULT_SUMMARY_MD,
+    plot_start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
 ) -> None:
     rows = build_daily_rows(parse_history(history_path))
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -632,9 +670,9 @@ def write_daily_rollup(
         writer.writerows(rows)
     tmp_path.replace(out_path)
     if svg_path is not None:
-        write_growth_svg(rows, svg_path)
+        write_growth_svg(rows, svg_path, plot_start_date)
     if summary_md_path is not None:
-        write_summary_md(rows, summary_md_path)
+        write_summary_md(rows, summary_md_path, start_date=plot_start_date)
 
 
 def write_daily_rollup_target(
@@ -642,6 +680,7 @@ def write_daily_rollup_target(
     out_target: str,
     svg_target: Optional[str] = None,
     summary_md_target: Optional[str] = None,
+    plot_start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
 ) -> None:
     history_raw = str(history_target)
     out_raw = str(out_target)
@@ -656,7 +695,7 @@ def write_daily_rollup_target(
     ):
         svg_path = None if svg_raw is None else Path(svg_raw)
         summary_path = None if summary_raw is None else Path(summary_raw)
-        write_daily_rollup(Path(history_raw), Path(out_raw), svg_path, summary_path)
+        write_daily_rollup(Path(history_raw), Path(out_raw), svg_path, summary_path, plot_start_date)
         return
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -666,7 +705,7 @@ def write_daily_rollup_target(
         local_svg = None if svg_raw is None else (tmpdir_path / "crawl_daily_growth.svg")
         local_summary = None if summary_raw is None else (tmpdir_path / "crawl_daily_summary.md")
         copy_target_to_local(history_raw, local_history)
-        write_daily_rollup(local_history, local_out, local_svg, local_summary)
+        write_daily_rollup(local_history, local_out, local_svg, local_summary, plot_start_date)
         write_bytes_atomic(out_raw, local_out.read_bytes())
         if local_svg is not None and svg_raw is not None:
             write_bytes_atomic(svg_raw, local_svg.read_bytes())
@@ -686,10 +725,13 @@ def main() -> None:
                     help=f"Output SVG plot path (default: {DEFAULT_SVG})")
     ap.add_argument("--summary-md", default=str(DEFAULT_SUMMARY_MD),
                     help=f"Output markdown summary path (default: {DEFAULT_SUMMARY_MD})")
+    ap.add_argument("--plot-start-date", default=str(DEFAULT_PLOT_START_DATE),
+                    help=f"Only show dates on/after this ISO date in the plot/summary (default: {DEFAULT_PLOT_START_DATE})")
     args = ap.parse_args()
     svg_target = None if str(args.svg).strip().lower() in {"", "none", "off"} else str(args.svg)
     summary_target = None if str(args.summary_md).strip().lower() in {"", "none", "off"} else str(args.summary_md)
-    write_daily_rollup_target(str(args.history), str(args.out), svg_target, summary_target)
+    plot_start_date = None if str(args.plot_start_date).strip().lower() in {"", "none", "off"} else str(args.plot_start_date)
+    write_daily_rollup_target(str(args.history), str(args.out), svg_target, summary_target, plot_start_date)
 
 
 if __name__ == "__main__":
