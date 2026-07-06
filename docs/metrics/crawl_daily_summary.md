@@ -10,18 +10,18 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ## Latest day
 
-- Snapshot window: `2026-07-06T00:25:20+02:00` to `2026-07-06T19:07:30+02:00` local (`179` snapshots)
-- Entities in KB: `1,292,996` (`+98,128` today)
-- Relationships in KB: `19,561,004` (positive gain `+1,728,465`, net `+1,252,614`)
-- Completed entities (all pages crawled): `1,878` (`+478` today)
-- Queue: `done 1,906 (+494)`, `processing 7 (-3)`, `pending 903,170 (+36,296)`, `errors 232 (+18)`
-- Relationship drop/reset events recorded today: `15`
+- Snapshot window: `2026-07-06T00:25:20+02:00` to `2026-07-06T22:30:08+02:00` local (`218` snapshots)
+- Entities in KB: `1,312,094` (`+117,226` today)
+- Relationships in KB: `20,039,043` (positive gain `+2,207,507`, net `+1,730,653`)
+- Completed entities (all pages crawled): `1,989` (`+589` today)
+- Queue: `done 2,017 (+605)`, `processing 16 (+6)`, `pending 902,013 (+35,139)`, `errors 233 (+19)`
+- Relationship drop/reset events recorded today: `17`
 
 ## Recent days
 
 | Date | Edges in KB | Positive gain | Entities in KB | Completed | Pending | Notes |
 |---|---:|---:|---:|---:|---:|---|
-| 2026-07-06 | 19,561,004 | +1,728,465 | 1,292,996 | 1,878 | 903,170 | 15 drop/reset day, errors +18 |
+| 2026-07-06 | 20,039,043 | +2,207,507 | 1,312,094 | 1,989 | 902,013 | 17 drop/reset day, errors +19 |
 | 2026-07-05 | 18,312,350 | +3,625,734 | 1,194,501 | 1,400 | 866,320 | 2 drop/reset day, errors +51 |
 | 2026-07-04 | 14,697,037 | +2,735,677 | 1,047,113 | 817 | 655,906 | 2 drop/reset day, errors +73 |
 | 2026-07-03 | 11,947,931 | +1,444,814 | 921,243 | 459 | 454,772 | 13 drop/reset day, errors +27 |
