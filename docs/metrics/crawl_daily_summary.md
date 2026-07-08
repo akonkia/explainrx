@@ -10,7 +10,7 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ## Latest day
 
-- Snapshot window: `2026-07-08T11:25:02+02:00` to `2026-07-08T16:05:39+02:00` local (`2` snapshots)
+- Snapshot window: `2026-07-08T11:25:02+02:00` to `2026-07-08T18:36:06+02:00` local (`3` snapshots)
 - Entities in KB: `763,286` (`+0` today)
 - Relationships in KB: `15,786,051` (positive gain `+0`, net `+0`)
 - Completed entities (all pages crawled): `151` (`+0` today)
