@@ -10,23 +10,23 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ## Latest day
 
-- Snapshot window: `2026-07-09T09:07:26+02:00` to `2026-07-09T09:07:26+02:00` local (`1` snapshots)
-- Entities in KB: `763,286` (`+0` today)
-- Relationships in KB: `15,786,051` (positive gain `+0`, net `+0`)
+- Snapshot window: `2026-07-09T00:03:18+02:00` to `2026-07-09T09:25:29+02:00` local (`89` snapshots)
+- Entities in KB: `763,286` (`-5,262` today)
+- Relationships in KB: `15,786,051` (positive gain `+46,910`, net `-144,112`)
 - Completed entities (all pages crawled): `151` (`+0` today)
-- Queue: `done 19 (+0)`, `processing 2 (+0)`, `pending 117,532 (+0)`, `errors 0 (+0)`
-- Relationship drop/reset events recorded today: `0`
+- Queue: `done 19 (+0)`, `processing 2 (-4)`, `pending 117,532 (-15,153)`, `errors 0 (+0)`
+- Relationship drop/reset events recorded today: `1`
 
 ## Recent days
 
 | Date | Edges in KB | Positive gain | Entities in KB | Completed | Pending | Notes |
 |---|---:|---:|---:|---:|---:|---|
-| 2026-07-09 | 15,786,051 | +0 | 763,286 | 151 | 117,532 |  |
-| 2026-07-08 | 15,786,051 | +0 | 763,286 | 151 | 117,532 |  |
-| 2026-07-07 | 15,786,051 | +0 | 763,286 | 151 | 117,532 |  |
-| 2026-07-06 | 20,091,695 | +2,260,159 | 1,313,667 | 151 | 919,963 | 17 drop/reset day, errors +20 |
-| 2026-07-05 | 18,312,350 | +3,625,734 | 1,194,501 | 151 | 866,320 | 2 drop/reset day, errors +51 |
-| 2026-07-04 | 14,697,037 | +2,735,677 | 1,047,113 | 150 | 655,906 | 2 drop/reset day, errors +73 |
-| 2026-07-03 | 11,947,931 | +1,444,814 | 921,243 | 150 | 454,772 | 13 drop/reset day, errors +27 |
+| 2026-07-09 | 15,786,051 | +46,910 | 763,286 | 151 | 117,532 | 1 drop/reset day |
+| 2026-07-08 | 15,927,736 | +68,785 | 768,515 | 151 | 132,685 |  |
+| 2026-07-07 | 15,858,951 | +69,822 | 766,113 | 151 | 125,817 |  |
+| 2026-07-06 | 15,789,129 | +60,178 | 763,482 | 151 | 117,995 |  |
+| 2026-07-05 | 15,719,565 | +77,945 | 760,170 | 151 | 110,827 |  |
+| 2026-07-04 | 15,639,121 | +56,043 | 756,650 | 150 | 100,618 |  |
+| 2026-07-03 | 15,562,897 | +81,945 | 754,547 | 150 | 89,021 |  |
 
 Generated from `crawl_daily_progress.csv`.
