@@ -24,7 +24,7 @@
 <text x="534.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">15,786,051</text>
 <line x1="730.0" y1="128" x2="730.0" y2="164" stroke="#d8ddd2" stroke-width="1"/>
 <text x="748.0" y="140" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#70757a">Positive gain</text>
-<text x="748.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">37,759</text>
+<text x="748.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">50,169</text>
 <line x1="944.0" y1="128" x2="944.0" y2="164" stroke="#d8ddd2" stroke-width="1"/>
 <text x="962.0" y="140" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#70757a">Fully crawled</text>
 <text x="962.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">19</text>
@@ -115,8 +115,8 @@
 <rect x="894.1" y="699.4" width="34" height="42.6" rx="4" fill="#2a9d8f"/>
 <rect x="976.4" y="700.0" width="34" height="42.0" rx="4" fill="#2a9d8f"/>
 <rect x="1058.7" y="678.7" width="34" height="63.3" rx="4" fill="#2a9d8f"/>
-<rect x="1141.0" y="718.9" width="34" height="23.1" rx="4" fill="#2a9d8f"/>
-<circle cx="1158.0" cy="708.9" r="5" fill="#b3472c"/>
+<rect x="1141.0" y="711.4" width="34" height="30.6" rx="4" fill="#2a9d8f"/>
+<circle cx="1158.0" cy="701.4" r="5" fill="#b3472c"/>
 <path d="M 88.0 1048.0 L 170.3 1023.5 L 252.6 1017.7 L 334.9 1003.2 L 417.2 968.5 L 499.5 936.5 L 581.8 921.2 L 664.2 901.8 L 746.5 884.6 L 828.8 872.6 L 911.1 859.4 L 993.4 847.9 L 1075.7 834.0 L 1158.0 873.4" fill="none" stroke="#6f5499" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="88.0" cy="1048.0" r="5" fill="#6f5499"/>
 <circle cx="170.3" cy="1023.5" r="5" fill="#6f5499"/>
