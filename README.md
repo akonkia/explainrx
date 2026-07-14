@@ -13,7 +13,7 @@ Panel files:
 [Entities completed](docs/metrics/crawl_panel_done.png) ·
 [Entities in KB total](docs/metrics/crawl_panel_entities.png)
 
-## Crawl progress
+## Crawl Progress
 
 
 Latest daily summary: [docs/metrics/crawl_daily_summary.md](docs/metrics/crawl_daily_summary.md)

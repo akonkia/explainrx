@@ -15,6 +15,8 @@ import datetime as dt
 import html
 import math
 import os
+import shutil
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
@@ -42,6 +44,18 @@ DEFAULT_PLOT_START_DATE = os.environ.get(
     "EXPLAINRX_DAILY_PLOT_START_DATE",
     "2026-06-24",
 )
+DEFAULT_SOURCE_LABEL = os.environ.get(
+    "EXPLAINRX_CRAWL_SOURCE_LABEL",
+    "crawl history",
+)
+DEFAULT_DB = os.environ.get(
+    "EXPLAINRX_DB",
+    "",
+).strip()
+DEFAULT_COMPLETION_TIMELINE_FILE = os.environ.get(
+    "EXPLAINRX_COMPLETION_TIMELINE_FILE",
+    "",
+).strip()
 
 
 def _as_int(value: str):
@@ -75,6 +89,85 @@ def parse_history(path: Path) -> List[Dict[str, object]]:
 
     rows.sort(key=lambda r: int(r["ts"]))
     return rows
+
+
+def load_completion_timeline_from_psql(db: str) -> Dict[str, Dict[str, int]]:
+    db_name = str(db or "").strip()
+    if not db_name:
+        return {}
+
+    psql_bin = shutil.which("psql")
+    if not psql_bin:
+        for candidate in ("/opt/homebrew/bin/psql", "/usr/local/bin/psql", "/usr/bin/psql"):
+            if Path(candidate).exists():
+                psql_bin = candidate
+                break
+    if not psql_bin:
+        return {}
+
+    query = """
+        SELECT finished_at::date AS date, count(*) AS completed_that_day
+        FROM kb_crawl_progress
+        WHERE is_complete
+          AND finished_at IS NOT NULL
+        GROUP BY 1
+        ORDER BY 1
+    """
+    try:
+        proc = subprocess.run(
+            [psql_bin, "-d", db_name, "-X", "--csv", "-v", "ON_ERROR_STOP=1", "-c", query],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return {}
+    if proc.returncode != 0:
+        return {}
+
+    out: Dict[str, Dict[str, int]] = {}
+    cumulative = 0
+    reader = csv.DictReader(proc.stdout.splitlines())
+    for row in reader:
+        day = str(row.get("date", "")).strip()
+        if not day:
+            continue
+        try:
+            completed_that_day = int(row.get("completed_that_day") or 0)
+        except ValueError:
+            continue
+        cumulative += completed_that_day
+        out[day] = {
+            "completed_entities_that_day": completed_that_day,
+            "completed_entities_current": cumulative,
+        }
+    return out
+
+
+def load_completion_timeline_from_csv(path: Path) -> Dict[str, Dict[str, int]]:
+    if not path.exists():
+        return {}
+
+    out: Dict[str, Dict[str, int]] = {}
+    cumulative = 0
+    with path.open(newline="") as fh:
+        reader = csv.DictReader(fh)
+        for row in reader:
+            day = str(row.get("date", "")).strip()
+            if not day:
+                continue
+            raw = row.get("completed_entities_that_day", row.get("completed_that_day", 0))
+            try:
+                completed_that_day = int(raw or 0)
+            except ValueError:
+                continue
+            cumulative += completed_that_day
+            out[day] = {
+                "completed_entities_that_day": completed_that_day,
+                "completed_entities_current": cumulative,
+            }
+    return out
 
 
 def _first_metric(rows: List[Dict[str, object]], key: str):
@@ -132,13 +225,20 @@ def _relationship_stats(day_rows: List[Dict[str, object]]):
     }
 
 
-def build_daily_rows(records: Iterable[Dict[str, object]]) -> List[Dict[str, object]]:
+def build_daily_rows(
+    records: Iterable[Dict[str, object]],
+    completion_timeline: Optional[Dict[str, Dict[str, int]]] = None,
+) -> List[Dict[str, object]]:
     groups: Dict[str, List[Dict[str, object]]] = {}
     for row in records:
         local_dt = dt.datetime.fromtimestamp(int(row["ts"])).astimezone()
         groups.setdefault(local_dt.date().isoformat(), []).append(row)
 
     out: List[Dict[str, object]] = []
+    completion_map = completion_timeline or {}
+    completion_days = sorted(completion_map)
+    completion_idx = 0
+    last_completion_cumulative = 0
     for day in sorted(groups):
         day_rows = groups[day]
         first = day_rows[0]
@@ -155,6 +255,28 @@ def build_daily_rows(records: Iterable[Dict[str, object]]) -> List[Dict[str, obj
         end_pending = _last_metric(day_rows, "pending")
         start_err = _first_metric(day_rows, "err")
         end_err = _last_metric(day_rows, "err")
+        start_complete = _first_metric(day_rows, "complete")
+        end_complete = _last_metric(day_rows, "complete")
+
+        completed_today: object = ""
+        completed_cumulative: object = ""
+        if completion_map:
+            while completion_idx < len(completion_days) and completion_days[completion_idx] <= day:
+                day_key = completion_days[completion_idx]
+                last_completion_cumulative = int(
+                    completion_map[day_key]["completed_entities_current"]
+                )
+                completion_idx += 1
+            completed_cumulative = last_completion_cumulative
+            completed_today = int(
+                completion_map.get(day, {}).get("completed_entities_that_day", 0)
+            )
+        elif isinstance(end_complete, int):
+            completed_cumulative = end_complete
+            if isinstance(start_complete, int):
+                completed_today = end_complete - start_complete
+            else:
+                completed_today = end_complete
 
         row = {
             "date": day,
@@ -186,6 +308,8 @@ def build_daily_rows(records: Iterable[Dict[str, object]]) -> List[Dict[str, obj
             "error_change": (end_err - start_err
                              if isinstance(start_err, int) and isinstance(end_err, int)
                              else ""),
+            "completed_entities_that_day": completed_today,
+            "completed_entities_current": completed_cumulative,
         }
         row.update(_relationship_stats(day_rows))
         out.append(row)
@@ -274,12 +398,16 @@ def write_summary_md(
     out_path: Path,
     recent_days: int = 7,
     start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
+    source_label: str = DEFAULT_SOURCE_LABEL,
+    svg_ref: str = "crawl_daily_growth.svg",
+    csv_ref: str = "crawl_daily_progress.csv",
 ) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     display_rows = _filter_display_rows(rows, start_date)
     if not display_rows:
         out_path.write_text(
             "# ExplainRx crawl daily summary\n\n"
+            f"Source: **{source_label}**\n\n"
             f"No daily crawl history is available on or after `{start_date}`.\n"
         )
         return
@@ -290,10 +418,15 @@ def write_summary_md(
     last_at = str(latest.get("last_snapshot_at", "—"))
     snapshot_count = latest.get("snapshot_count")
     drop_events = int(latest.get("relationship_drop_events", 0) or 0)
+    has_completed = any(
+        isinstance(row.get("completed_entities_current"), int)
+        for row in display_rows
+    )
+    completed_col = "Completed" if has_completed else "Queue done"
 
     recent = display_rows[-recent_days:]
     table_lines = [
-        "| Date | Edges in KB | Positive gain | Entities in KB | Done | Pending | Notes |",
+        f"| Date | Edges in KB | Positive gain | Entities in KB | {completed_col} | Pending | Notes |",
         "|---|---:|---:|---:|---:|---:|---|",
     ]
     for row in reversed(recent):
@@ -309,11 +442,22 @@ def write_summary_md(
                 edges=_fmt_int(row.get("end_relationships")),
                 gain=_fmt_delta(row.get("positive_relationship_gain")),
                 entities=_fmt_int(row.get("end_entities")),
-                done=_fmt_int(row.get("end_done")),
+                done=_fmt_int(
+                    row.get("completed_entities_current")
+                    if has_completed
+                    else row.get("end_done")
+                ),
                 pending=_fmt_int(row.get("end_pending")),
                 notes=", ".join(notes) if notes else "",
             )
         )
+
+    latest_completed_line = (
+        f"- Completed entities (all pages crawled): `{_fmt_int(latest.get('completed_entities_current'))}` "
+        f"(`{_fmt_delta(latest.get('completed_entities_that_day'))}` today)"
+        if has_completed
+        else f"- Queue rows currently `done`: `{_fmt_int(latest.get('end_done'))}` (`{_fmt_delta(latest.get('done_change'))}` today)"
+    )
 
     md = "\n".join(
         [
@@ -321,7 +465,9 @@ def write_summary_md(
             "",
             f"Latest rollup day: **{latest_date}**",
             "",
-            "![ExplainRx crawl growth](crawl_daily_growth.svg)",
+            f"Source: **{source_label}**",
+            "",
+            f"![ExplainRx crawl growth]({svg_ref})",
             "",
             f"Display baseline: **{start_date} onward**. Earlier days are excluded because they used older ingestion rules.",
             "",
@@ -330,6 +476,7 @@ def write_summary_md(
             f"- Snapshot window: `{first_at}` to `{last_at}` local (`{snapshot_count}` snapshots)",
             f"- Entities in KB: `{_fmt_int(latest.get('end_entities'))}` (`{_fmt_delta(latest.get('entities_added'))}` today)",
             f"- Relationships in KB: `{_fmt_int(latest.get('end_relationships'))}` (positive gain `{_fmt_delta(latest.get('positive_relationship_gain'))}`, net `{_fmt_delta(latest.get('net_relationship_change'))}`)",
+            latest_completed_line,
             f"- Queue: `done {_fmt_int(latest.get('end_done'))} ({_fmt_delta(latest.get('done_change'))})`, `processing {_fmt_int(latest.get('end_processing'))} ({_fmt_delta(latest.get('processing_change'))})`, `pending {_fmt_int(latest.get('end_pending'))} ({_fmt_delta(latest.get('pending_change'))})`, `errors {_fmt_int(latest.get('end_errors'))} ({_fmt_delta(latest.get('error_change'))})`",
             f"- Relationship drop/reset events recorded today: `{drop_events}`",
             "",
@@ -337,7 +484,7 @@ def write_summary_md(
             "",
             *table_lines,
             "",
-            "Generated from `scripts/crawl_daily_progress.csv`.",
+            f"Generated from `{csv_ref}`.",
             "",
         ]
     )
@@ -348,23 +495,26 @@ def write_growth_svg(
     rows: List[Dict[str, object]],
     out_path: Path,
     start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
+    source_label: str = DEFAULT_SOURCE_LABEL,
 ) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     width = 1200
-    height = 1664
+    height = 1756
     left = 88
     right = 42
     top_title = 54
-    line_top = 118
-    line_bottom = 332
-    bar_top = 424
-    bar_bottom = 652
-    pending_top = 744
-    pending_bottom = 958
-    ent_top = 1050
-    ent_bottom = 1264
-    tot_top = 1356
-    tot_bottom = 1570
+    summary_top = 118
+    summary_bottom = 174
+    line_top = 208
+    line_bottom = 422
+    bar_top = 514
+    bar_bottom = 742
+    pending_top = 834
+    pending_bottom = 1048
+    ent_top = 1140
+    ent_bottom = 1354
+    tot_top = 1446
+    tot_bottom = 1660
     plot_width = width - left - right
     bg = "#f7f7f2"
     ink = "#202126"
@@ -383,7 +533,8 @@ def write_growth_svg(
         svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
   <rect width="100%" height="100%" fill="{bg}"/>
   <text x="60" y="90" font-family="Helvetica, Arial, sans-serif" font-size="28" fill="{ink}">ExplainRx crawl growth</text>
-  <text x="60" y="136" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="{muted}">No daily crawl history is available on or after {html.escape(str(start_date))}.</text>
+  <text x="60" y="126" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="{muted}">Source: {html.escape(source_label)}</text>
+  <text x="60" y="152" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="{muted}">No daily crawl history is available on or after {html.escape(str(start_date))}.</text>
 </svg>
 """
         out_path.write_text(svg)
@@ -395,6 +546,14 @@ def write_growth_svg(
     line_values = [int(r.get("end_relationships", 0) or 0) for r in display_rows]
     gain_values = [int(r.get("positive_relationship_gain", 0) or 0) for r in display_rows]
     latest = display_rows[-1]
+    latest_day = html.escape(str(latest["date"]))
+    latest_rel = html.escape(f"{int(latest.get('end_relationships', 0) or 0):,}")
+    latest_gain = html.escape(f"{int(latest.get('positive_relationship_gain', 0) or 0):,}")
+    latest_pending = html.escape(f"{int(latest.get('end_pending', 0) or 0):,}")
+    latest_ent = (
+        f"{int(latest['end_entities']):,}"
+        if isinstance(latest.get("end_entities"), int) else "—"
+    )
 
     line_min = min(line_values)
     line_max = max(line_values)
@@ -414,12 +573,43 @@ def write_growth_svg(
         pending_min = max(0, pending_min - 1)
         pending_max = pending_max + 1
 
-    # "Completed" entities = crawl-queue items whose pages are all exhausted
-    # (status='done'). This is the end-of-day `done` count, available for every
-    # day; it can dip when the queue is re-seeded, which is expected.
-    ent_indexed = [(i, int(r["end_done"]))
-                   for i, r in enumerate(display_rows)
-                   if isinstance(r.get("end_done"), int)]
+    has_completed = any(
+        isinstance(r.get("completed_entities_current"), int)
+        for r in display_rows
+    )
+    ent_label = (
+        "Entities fully crawled (all pages)"
+        if has_completed
+        else "Queue items currently done"
+    )
+    ent_legend = (
+        "Fully crawled entities"
+        if has_completed
+        else "Current done count"
+    )
+    ent_fallback = (
+        "No fully crawled-entity counts available yet."
+        if has_completed
+        else "No done-queue counts logged yet."
+    )
+
+    ent_indexed = [
+        (
+            i,
+            int(
+                r["completed_entities_current"]
+                if has_completed
+                else r["end_done"]
+            ),
+        )
+        for i, r in enumerate(display_rows)
+        if isinstance(
+            r.get("completed_entities_current")
+            if has_completed
+            else r.get("end_done"),
+            int,
+        )
+    ]
     ent_vals = [v for _, v in ent_indexed]
     ent_min = min(ent_vals) if ent_vals else 0
     ent_max = max(ent_vals) if ent_vals else 1
@@ -468,12 +658,27 @@ def write_growth_svg(
     tot_tick_vals = _ticks(tot_min, tot_max, 5) if tot_vals else []
     tot_points = [(xs[i], _scale(v, tot_min, tot_max, tot_bottom, tot_top))
                   for i, v in tot_indexed]
+    latest_completed = (
+        f"{int(latest['completed_entities_current']):,}"
+        if isinstance(latest.get("completed_entities_current"), int) else None
+    )
+    latest_status_label = "Fully crawled" if latest_completed is not None else "Pending queue"
+    latest_status_value = html.escape(latest_completed) if latest_completed is not None else latest_pending
+    summary_cells = [
+        ("Latest day", latest_day),
+        ("Entities in KB", html.escape(latest_ent)),
+        ("Edges in KB", latest_rel),
+        ("Positive gain", latest_gain),
+        (latest_status_label, latest_status_value),
+    ]
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         f'<rect width="100%" height="100%" fill="{bg}"/>',
         f'<text x="60" y="{top_title}" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700" fill="{ink}">ExplainRx crawl growth</text>',
-        f'<text x="60" y="{top_title + 28}" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="{muted}">Daily relationship count and daily positive relationship gain, starting {html.escape(str(start_date))} because earlier days used older ingestion rules</text>',
+        f'<text x="60" y="{top_title + 24}" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="{muted}">Source: {html.escape(source_label)}</text>',
+        f'<text x="60" y="{top_title + 46}" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="{muted}">Daily relationship count and daily positive relationship gain, starting {html.escape(str(start_date))} because earlier days used older ingestion rules</text>',
+        f'<rect x="{left}" y="{summary_top}" width="{plot_width}" height="{summary_bottom - summary_top}" fill="#ffffff" rx="10"/>',
         f'<rect x="{left}" y="{line_top}" width="{plot_width}" height="{line_bottom - line_top}" fill="#ffffff" rx="10"/>',
         f'<rect x="{left}" y="{bar_top}" width="{plot_width}" height="{bar_bottom - bar_top}" fill="#ffffff" rx="10"/>',
         f'<rect x="{left}" y="{pending_top}" width="{plot_width}" height="{pending_bottom - pending_top}" fill="#ffffff" rx="10"/>',
@@ -482,9 +687,23 @@ def write_growth_svg(
         f'<text x="{left}" y="{line_top - 18}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">Edges in KB (relationships, end-of-day total)</text>',
         f'<text x="{left}" y="{bar_top - 18}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">Daily positive relationship gain</text>',
         f'<text x="{left}" y="{pending_top - 18}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">End-of-day pending queue</text>',
-        f'<text x="{left}" y="{ent_top - 18}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">Entities completed (all pages exhausted)</text>',
+        f'<text x="{left}" y="{ent_top - 18}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">{html.escape(ent_label)}</text>',
         f'<text x="{left}" y="{tot_top - 18}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">Entities in KB (total)</text>',
     ]
+
+    cell_width = plot_width / len(summary_cells)
+    for idx, (label, value) in enumerate(summary_cells):
+        cell_x = left + idx * cell_width
+        if idx > 0:
+            parts.append(
+                f'<line x1="{cell_x:.1f}" y1="{summary_top + 10}" x2="{cell_x:.1f}" y2="{summary_bottom - 10}" stroke="{grid}" stroke-width="1"/>'
+            )
+        parts.append(
+            f'<text x="{cell_x + 18:.1f}" y="{summary_top + 22}" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="{muted}">{html.escape(label)}</text>'
+        )
+        parts.append(
+            f'<text x="{cell_x + 18:.1f}" y="{summary_top + 45}" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="{ink}">{value}</text>'
+        )
 
     for tick in line_tick_vals:
         y = _scale(tick, line_min, line_max, line_bottom, line_top)
@@ -559,7 +778,7 @@ def write_growth_svg(
             if idx == len(ent_points) - 1:
                 parts.append(f'<text x="{x + 10:.1f}" y="{y - 10:.1f}" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="{ent_color}">{html.escape(f"{value:,}")}</text>')
     else:
-        parts.append(f'<text x="{left + plot_width / 2:.1f}" y="{(ent_top + ent_bottom) / 2:.1f}" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="{muted}">No completed-entity counts logged yet.</text>')
+        parts.append(f'<text x="{left + plot_width / 2:.1f}" y="{(ent_top + ent_bottom) / 2:.1f}" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="{muted}">{html.escape(ent_fallback)}</text>')
 
     # Total entities-in-KB line plot (only days that logged ent=)
     if tot_points:
@@ -581,26 +800,6 @@ def write_growth_svg(
     for x, label in zip(xs, labels):
         parts.append(f'<text x="{x:.1f}" y="{tot_bottom + 24}" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="{muted}">{html.escape(label)}</text>')
 
-    # Summary panel
-    # Sit the summary box in the empty lower-right of panel 1 (the edges line
-    # rises left-to-right, so that corner is clear) instead of over the peak.
-    summary_x = width - 336
-    summary_y = 188
-    latest_day = html.escape(str(latest["date"]))
-    latest_rel = html.escape(f"{int(latest.get('end_relationships', 0) or 0):,}")
-    latest_gain = html.escape(f"{int(latest.get('positive_relationship_gain', 0) or 0):,}")
-    latest_pending = html.escape(f"{int(latest.get('end_pending', 0) or 0):,}")
-    latest_ent = (f"{int(latest['end_entities']):,}"
-                  if isinstance(latest.get("end_entities"), int) else "—")
-    parts += [
-        f'<rect x="{summary_x}" y="{summary_y}" width="276" height="150" rx="12" fill="#ffffff" stroke="#d8ddd2"/>',
-        f'<text x="{summary_x + 18}" y="{summary_y + 28}" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="{ink}">Latest day: {latest_day}</text>',
-        f'<text x="{summary_x + 18}" y="{summary_y + 54}" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="{ink}">Entities in KB: {html.escape(latest_ent)}</text>',
-        f'<text x="{summary_x + 18}" y="{summary_y + 76}" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="{ink}">Edges in KB: {latest_rel}</text>',
-        f'<text x="{summary_x + 18}" y="{summary_y + 98}" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="{ink}">Positive gain: {latest_gain}</text>',
-        f'<text x="{summary_x + 18}" y="{summary_y + 120}" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="{ink}">Pending queue: {latest_pending}</text>',
-    ]
-
     # Legend — two rows so nothing clips the canvas edge.
     legend_y1 = height - 52
     legend_y2 = height - 24
@@ -610,7 +809,7 @@ def write_growth_svg(
         f'<line x1="280" y1="{legend_y1}" x2="304" y2="{legend_y1}" stroke="{pending_color}" stroke-width="4"/>',
         f'<text x="314" y="{legend_y1 + 5}" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="{ink}">Pending queue</text>',
         f'<line x1="520" y1="{legend_y1}" x2="544" y2="{legend_y1}" stroke="{ent_color}" stroke-width="4"/>',
-        f'<text x="554" y="{legend_y1 + 5}" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="{ink}">Entities completed</text>',
+        f'<text x="554" y="{legend_y1 + 5}" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="{ink}">{html.escape(ent_legend)}</text>',
         f'<line x1="800" y1="{legend_y1}" x2="824" y2="{legend_y1}" stroke="{tot_color}" stroke-width="4"/>',
         f'<text x="834" y="{legend_y1 + 5}" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="{ink}">Entities in KB (total)</text>',
         f'<rect x="60" y="{legend_y2 - 11}" width="20" height="20" rx="4" fill="{gain_color}"/>',
@@ -629,8 +828,19 @@ def write_daily_rollup(
     svg_path: Optional[Path] = DEFAULT_SVG,
     summary_md_path: Optional[Path] = DEFAULT_SUMMARY_MD,
     plot_start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
+    source_label: str = DEFAULT_SOURCE_LABEL,
+    completion_db: str = DEFAULT_DB,
+    completion_timeline_file: Optional[str] = DEFAULT_COMPLETION_TIMELINE_FILE,
 ) -> None:
-    rows = build_daily_rows(parse_history(history_path))
+    completion_timeline = {}
+    completion_file_raw = str(completion_timeline_file or "").strip()
+    if completion_file_raw:
+        completion_timeline = load_completion_timeline_from_csv(Path(completion_file_raw))
+    if not completion_timeline:
+        completion_timeline = load_completion_timeline_from_psql(completion_db)
+    rows = build_daily_rows(parse_history(history_path), completion_timeline)
+    for row in rows:
+        row["source_label"] = source_label
     out_path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
 
@@ -662,6 +872,9 @@ def write_daily_rollup(
         "start_errors",
         "end_errors",
         "error_change",
+        "completed_entities_that_day",
+        "completed_entities_current",
+        "source_label",
     ]
 
     with tmp_path.open("w", newline="") as fh:
@@ -670,9 +883,18 @@ def write_daily_rollup(
         writer.writerows(rows)
     tmp_path.replace(out_path)
     if svg_path is not None:
-        write_growth_svg(rows, svg_path, plot_start_date)
+        write_growth_svg(rows, svg_path, plot_start_date, source_label)
     if summary_md_path is not None:
-        write_summary_md(rows, summary_md_path, start_date=plot_start_date)
+        svg_ref = Path(svg_path).name if svg_path is not None else "crawl_daily_growth.svg"
+        csv_ref = Path(out_path).name
+        write_summary_md(
+            rows,
+            summary_md_path,
+            start_date=plot_start_date,
+            source_label=source_label,
+            svg_ref=svg_ref,
+            csv_ref=csv_ref,
+        )
 
 
 def write_daily_rollup_target(
@@ -681,6 +903,9 @@ def write_daily_rollup_target(
     svg_target: Optional[str] = None,
     summary_md_target: Optional[str] = None,
     plot_start_date: Optional[str] = DEFAULT_PLOT_START_DATE,
+    source_label: str = DEFAULT_SOURCE_LABEL,
+    completion_db: str = DEFAULT_DB,
+    completion_timeline_file: Optional[str] = DEFAULT_COMPLETION_TIMELINE_FILE,
 ) -> None:
     history_raw = str(history_target)
     out_raw = str(out_target)
@@ -695,7 +920,16 @@ def write_daily_rollup_target(
     ):
         svg_path = None if svg_raw is None else Path(svg_raw)
         summary_path = None if summary_raw is None else Path(summary_raw)
-        write_daily_rollup(Path(history_raw), Path(out_raw), svg_path, summary_path, plot_start_date)
+        write_daily_rollup(
+            Path(history_raw),
+            Path(out_raw),
+            svg_path,
+            summary_path,
+            plot_start_date,
+            source_label,
+            completion_db,
+            completion_timeline_file,
+        )
         return
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -705,7 +939,16 @@ def write_daily_rollup_target(
         local_svg = None if svg_raw is None else (tmpdir_path / "crawl_daily_growth.svg")
         local_summary = None if summary_raw is None else (tmpdir_path / "crawl_daily_summary.md")
         copy_target_to_local(history_raw, local_history)
-        write_daily_rollup(local_history, local_out, local_svg, local_summary, plot_start_date)
+        write_daily_rollup(
+            local_history,
+            local_out,
+            local_svg,
+            local_summary,
+            plot_start_date,
+            source_label,
+            completion_db,
+            completion_timeline_file,
+        )
         write_bytes_atomic(out_raw, local_out.read_bytes())
         if local_svg is not None and svg_raw is not None:
             write_bytes_atomic(svg_raw, local_svg.read_bytes())
@@ -727,11 +970,26 @@ def main() -> None:
                     help=f"Output markdown summary path (default: {DEFAULT_SUMMARY_MD})")
     ap.add_argument("--plot-start-date", default=str(DEFAULT_PLOT_START_DATE),
                     help=f"Only show dates on/after this ISO date in the plot/summary (default: {DEFAULT_PLOT_START_DATE})")
+    ap.add_argument("--source-label", default=str(DEFAULT_SOURCE_LABEL),
+                    help=f"Human-readable source label stamped into the CSV/plot/summary (default: {DEFAULT_SOURCE_LABEL})")
+    ap.add_argument("--db", default=str(DEFAULT_DB),
+                    help="Database name used to derive cumulative all-pages-crawled entity counts via psql")
+    ap.add_argument("--completion-timeline-file", default=str(DEFAULT_COMPLETION_TIMELINE_FILE),
+                    help="Optional CSV file with date,completed_that_day rows for durable crawl completions")
     args = ap.parse_args()
     svg_target = None if str(args.svg).strip().lower() in {"", "none", "off"} else str(args.svg)
     summary_target = None if str(args.summary_md).strip().lower() in {"", "none", "off"} else str(args.summary_md)
     plot_start_date = None if str(args.plot_start_date).strip().lower() in {"", "none", "off"} else str(args.plot_start_date)
-    write_daily_rollup_target(str(args.history), str(args.out), svg_target, summary_target, plot_start_date)
+    write_daily_rollup_target(
+        str(args.history),
+        str(args.out),
+        svg_target,
+        summary_target,
+        plot_start_date,
+        str(args.source_label),
+        str(args.db),
+        str(args.completion_timeline_file),
+    )
 
 
 if __name__ == "__main__":

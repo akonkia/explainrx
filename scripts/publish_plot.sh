@@ -47,16 +47,51 @@ mkdir -p "$CLONE_DIR/$(dirname "$SVG_REL")"
 cp "$SRC_SVG" "$CLONE_DIR/$SVG_REL"
 cp "$SRC_SUMMARY" "$CLONE_DIR/$SUMMARY_REL"
 
-# Add the README embed/link once, if it isn't already referenced.
 README="$CLONE_DIR/README.md"
-if [[ ! -f "$README" ]] || ! grep -q "$SVG_REL" "$README" 2>/dev/null; then
-  echo "==> Adding plot embed to README.md"
-  printf '\n## Crawl progress\n\n![ExplainRx crawl progress](%s)\n' "$SVG_REL" >> "$README"
-fi
-if [[ ! -f "$README" ]] || ! grep -q "$SUMMARY_REL" "$README" 2>/dev/null; then
-  echo "==> Adding summary link to README.md"
-  printf '\nLatest daily summary: [%s](%s)\n' "$SUMMARY_REL" "$SUMMARY_REL" >> "$README"
-fi
+echo "==> Syncing README crawl progress block"
+python3 - "$README" "$SVG_REL" "$SUMMARY_REL" "$SRC_SUMMARY" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+readme_path = Path(sys.argv[1])
+svg_rel = sys.argv[2]
+summary_rel = sys.argv[3]
+summary_path = Path(sys.argv[4])
+
+readme = readme_path.read_text() if readme_path.exists() else ""
+summary = summary_path.read_text()
+
+summary_lines = []
+for line in summary.splitlines():
+    if line.startswith("# ExplainRx crawl daily summary"):
+        continue
+    if line.strip() == "![ExplainRx crawl growth](crawl_daily_growth.svg)":
+        continue
+    if line.startswith("## "):
+        line = "### " + line[3:]
+    summary_lines.append(line)
+summary_body = "\n".join(summary_lines).strip()
+
+block = (
+    "## Crawl Progress\n\n"
+    f"![ExplainRx crawl progress]({svg_rel})\n\n"
+    "<!-- CRAWL_PROGRESS:START -->\n"
+    f"Latest daily summary: [{summary_rel}]({summary_rel})\n\n"
+    f"{summary_body}\n"
+    "<!-- CRAWL_PROGRESS:END -->\n"
+)
+
+section_re = re.compile(r"\n## Crawl Progress\n.*?(?=\n## |\Z)", re.S)
+if section_re.search(readme):
+    readme = section_re.sub("\n" + block.rstrip() + "\n", readme, count=1)
+else:
+    if readme and not readme.endswith("\n"):
+        readme += "\n"
+    readme += "\n" + block
+
+readme_path.write_text(readme)
+PY
 
 echo "==> Committing and pushing (if anything changed)"
 git -C "$CLONE_DIR" add "$SVG_REL" "$SUMMARY_REL" README.md
