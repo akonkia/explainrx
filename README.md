@@ -17,3 +17,41 @@ Panel files:
 
 
 Latest daily summary: [docs/metrics/crawl_daily_summary.md](docs/metrics/crawl_daily_summary.md)
+
+## Crawl Progress
+
+![ExplainRx crawl progress](docs/metrics/crawl_daily_growth.svg)
+
+<!-- CRAWL_PROGRESS:START -->
+Latest daily summary: [docs/metrics/crawl_daily_summary.md](docs/metrics/crawl_daily_summary.md)
+
+Latest rollup day: **2026-07-14**
+
+Source: **shared Pi crawl via agnes@192.168.1.21**
+
+
+Display baseline: **2026-06-24 onward**. Earlier days are excluded because they used older ingestion rules.
+
+### Latest day
+
+- Snapshot window: `2026-07-14T18:30:12+02:00` to `2026-07-14T20:22:10+02:00` local (`32` snapshots)
+- Entities in KB: `773,363` (`+138` today)
+- Relationships in KB: `16,094,037` (positive gain `+4,619`, net `+4,619`)
+- Completed entities (all pages crawled): `152` (`+0` today)
+- Queue: `done 21 (+0)`, `processing 10 (+0)`, `pending 145,722 (+454)`, `errors 0 (+0)`
+- Relationship drop/reset events recorded today: `0`
+
+### Recent days
+
+| Date | Edges in KB | Positive gain | Entities in KB | Completed | Pending | Notes |
+|---|---:|---:|---:|---:|---:|---|
+| 2026-07-14 | 16,094,037 | +4,619 | 773,363 | 152 | 145,722 |  |
+| 2026-07-10 | 16,089,418 | +55,652 | 773,225 | 152 | 145,262 |  |
+| 2026-07-09 | 16,033,766 | +103,603 | 771,900 | 152 | 140,976 |  |
+| 2026-07-08 | 15,927,736 | +68,785 | 768,515 | 151 | 132,685 |  |
+| 2026-07-07 | 15,858,951 | +69,822 | 766,113 | 151 | 125,817 |  |
+| 2026-07-06 | 15,789,129 | +60,178 | 763,482 | 151 | 117,995 |  |
+| 2026-07-05 | 15,719,565 | +77,945 | 760,170 | 151 | 110,827 |  |
+
+Generated from `crawl_daily_progress.csv`.
+<!-- CRAWL_PROGRESS:END -->
