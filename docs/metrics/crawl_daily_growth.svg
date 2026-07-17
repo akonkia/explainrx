@@ -27,7 +27,7 @@
 <text x="748.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">21,204</text>
 <line x1="944.0" y1="128" x2="944.0" y2="164" stroke="#d8ddd2" stroke-width="1"/>
 <text x="962.0" y="140" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#70757a">Fully crawled</text>
-<text x="962.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">151</text>
+<text x="962.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">160</text>
 <line x1="88" y1="450.4" x2="1158" y2="450.4" stroke="#d8ddd2" stroke-width="1"/>
 <text x="76" y="455.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">15.0M</text>
 <line x1="88" y1="351.5" x2="1158" y2="351.5" stroke="#d8ddd2" stroke-width="1"/>
@@ -57,15 +57,13 @@
 <line x1="88" y1="764.2" x2="1158" y2="764.2" stroke="#d8ddd2" stroke-width="1"/>
 <text x="76" y="769.2" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">200.0k</text>
 <line x1="88" y1="1354.0" x2="1158" y2="1354.0" stroke="#d8ddd2" stroke-width="1"/>
-<text x="76" y="1359.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">144</text>
-<line x1="88" y1="1292.9" x2="1158" y2="1292.9" stroke="#d8ddd2" stroke-width="1"/>
-<text x="76" y="1297.9" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">146</text>
-<line x1="88" y1="1231.7" x2="1158" y2="1231.7" stroke="#d8ddd2" stroke-width="1"/>
-<text x="76" y="1236.7" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">148</text>
-<line x1="88" y1="1170.6" x2="1158" y2="1170.6" stroke="#d8ddd2" stroke-width="1"/>
-<text x="76" y="1175.6" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">150</text>
-<line x1="88" y1="1109.4" x2="1158" y2="1109.4" stroke="#d8ddd2" stroke-width="1"/>
-<text x="76" y="1114.4" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">152</text>
+<text x="76" y="1359.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">145</text>
+<line x1="88" y1="1282.7" x2="1158" y2="1282.7" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="1287.7" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">150</text>
+<line x1="88" y1="1211.3" x2="1158" y2="1211.3" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="1216.3" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">155</text>
+<line x1="88" y1="1140.0" x2="1158" y2="1140.0" stroke="#d8ddd2" stroke-width="1"/>
+<text x="76" y="1145.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">160</text>
 <line x1="88" y1="1734.0" x2="1158" y2="1734.0" stroke="#d8ddd2" stroke-width="1"/>
 <text x="76" y="1739.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#70757a">740.0k</text>
 <line x1="88" y1="1654.5" x2="1158" y2="1654.5" stroke="#d8ddd2" stroke-width="1"/>
@@ -139,26 +137,26 @@
 <circle cx="1095.1" cy="836.7" r="5" fill="#6f5499"/>
 <circle cx="1158.0" cy="834.0" r="7" fill="#6f5499"/>
 <text x="1168.0" y="824.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#6f5499">154,125</text>
-<path d="M 88.0 1354.0 L 150.9 1292.9 L 213.9 1262.3 L 276.8 1262.3 L 339.8 1262.3 L 402.7 1231.7 L 465.6 1201.1 L 528.6 1201.1 L 591.5 1170.6 L 654.5 1170.6 L 717.4 1170.6 L 780.4 1170.6 L 843.3 1140.0 L 906.2 1140.0 L 969.2 1140.0 L 1032.1 1140.0 L 1095.1 1140.0 L 1158.0 1140.0" fill="none" stroke="#a6611a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 88.0 1354.0 L 150.9 1325.5 L 213.9 1311.2 L 276.8 1311.2 L 339.8 1311.2 L 402.7 1296.9 L 465.6 1282.7 L 528.6 1282.7 L 591.5 1168.5 L 654.5 1168.5 L 717.4 1168.5 L 780.4 1168.5 L 843.3 1140.0 L 906.2 1140.0 L 969.2 1140.0 L 1032.1 1140.0 L 1095.1 1140.0 L 1158.0 1140.0" fill="none" stroke="#a6611a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="88.0" cy="1354.0" r="5" fill="#a6611a"/>
-<circle cx="150.9" cy="1292.9" r="5" fill="#a6611a"/>
-<circle cx="213.9" cy="1262.3" r="5" fill="#a6611a"/>
-<circle cx="276.8" cy="1262.3" r="5" fill="#a6611a"/>
-<circle cx="339.8" cy="1262.3" r="5" fill="#a6611a"/>
-<circle cx="402.7" cy="1231.7" r="5" fill="#a6611a"/>
-<circle cx="465.6" cy="1201.1" r="5" fill="#a6611a"/>
-<circle cx="528.6" cy="1201.1" r="5" fill="#a6611a"/>
-<circle cx="591.5" cy="1170.6" r="5" fill="#a6611a"/>
-<circle cx="654.5" cy="1170.6" r="5" fill="#a6611a"/>
-<circle cx="717.4" cy="1170.6" r="5" fill="#a6611a"/>
-<circle cx="780.4" cy="1170.6" r="5" fill="#a6611a"/>
+<circle cx="150.9" cy="1325.5" r="5" fill="#a6611a"/>
+<circle cx="213.9" cy="1311.2" r="5" fill="#a6611a"/>
+<circle cx="276.8" cy="1311.2" r="5" fill="#a6611a"/>
+<circle cx="339.8" cy="1311.2" r="5" fill="#a6611a"/>
+<circle cx="402.7" cy="1296.9" r="5" fill="#a6611a"/>
+<circle cx="465.6" cy="1282.7" r="5" fill="#a6611a"/>
+<circle cx="528.6" cy="1282.7" r="5" fill="#a6611a"/>
+<circle cx="591.5" cy="1168.5" r="5" fill="#a6611a"/>
+<circle cx="654.5" cy="1168.5" r="5" fill="#a6611a"/>
+<circle cx="717.4" cy="1168.5" r="5" fill="#a6611a"/>
+<circle cx="780.4" cy="1168.5" r="5" fill="#a6611a"/>
 <circle cx="843.3" cy="1140.0" r="5" fill="#a6611a"/>
 <circle cx="906.2" cy="1140.0" r="5" fill="#a6611a"/>
 <circle cx="969.2" cy="1140.0" r="5" fill="#a6611a"/>
 <circle cx="1032.1" cy="1140.0" r="5" fill="#a6611a"/>
 <circle cx="1095.1" cy="1140.0" r="5" fill="#a6611a"/>
 <circle cx="1158.0" cy="1140.0" r="7" fill="#a6611a"/>
-<text x="1168.0" y="1130.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#a6611a">151</text>
+<text x="1168.0" y="1130.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#a6611a">160</text>
 <path d="M 276.8 1660.0 L 339.8 1655.7 L 402.7 1631.4 L 465.6 1618.4 L 528.6 1601.7 L 591.5 1573.7 L 654.5 1547.4 L 717.4 1526.5 L 780.4 1507.4 L 843.3 1480.5 L 906.2 1470.0 L 969.2 1468.0 L 1032.1 1458.9 L 1095.1 1449.7 L 1158.0 1446.0" fill="none" stroke="#2f6b3c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="276.8" cy="1660.0" r="5" fill="#2f6b3c"/>
 <circle cx="339.8" cy="1655.7" r="5" fill="#2f6b3c"/>
