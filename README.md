@@ -34,11 +34,11 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ### Latest day
 
-- Snapshot window: `2026-07-17T09:47:10+02:00` to `2026-07-17T21:11:54+02:00` local (`103` snapshots)
+- Snapshot window: `2026-07-17T09:47:10+02:00` to `2026-07-17T21:19:16+02:00` local (`104` snapshots)
 - Entities in KB: `776,239` (`+422` today)
 - Relationships in KB: `16,226,247` (positive gain `+21,204`, net `+14,497`)
-- Completed entities (all pages crawled): `151` (`+0` today)
-- Active queue: `processing 0 (-16)`, `pending 154,125 (+1,646)`, `errors 0 (+0)`
+- Entity page crawls exhausted: `151` (`+0` today)
+- Queue backlog: `processing 0 (-16)`, `pending 154,125 (+1,646)`, `errors 0 (+0)`
 - Relationship drop/reset events recorded today: `5`
 
 ### Recent days

@@ -12,7 +12,7 @@
 <text x="88" y="190" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">Edges in KB (relationships, end-of-day total)</text>
 <text x="88" y="496" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">Daily positive relationship gain</text>
 <text x="88" y="816" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">End-of-day pending queue</text>
-<text x="88" y="1122" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">Entities fully crawled (all pages)</text>
+<text x="88" y="1122" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">Entity page crawls exhausted</text>
 <text x="88" y="1428" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">Entities in KB (total)</text>
 <text x="106.0" y="140" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#70757a">Latest day</text>
 <text x="106.0" y="163" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#202126">2026-07-17</text>
@@ -199,7 +199,7 @@
 <line x1="280" y1="1704" x2="304" y2="1704" stroke="#6f5499" stroke-width="4"/>
 <text x="314" y="1709" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">Pending queue</text>
 <line x1="520" y1="1704" x2="544" y2="1704" stroke="#a6611a" stroke-width="4"/>
-<text x="554" y="1709" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">Fully crawled entities</text>
+<text x="554" y="1709" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">Entity page crawls exhausted</text>
 <line x1="800" y1="1704" x2="824" y2="1704" stroke="#2f6b3c" stroke-width="4"/>
 <text x="834" y="1709" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#202126">Entities in KB (total)</text>
 <rect x="60" y="1721" width="20" height="20" rx="4" fill="#2a9d8f"/>
