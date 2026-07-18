@@ -39,7 +39,7 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 - Relationships in KB: `16,224,316` (positive gain `+2,062`, net `+2,062`)
 - Entity page crawls exhausted: `163` (`+4` today)
 - Queue backlog: `processing 0 (+0)`, `pending 154,859 (+750)`, `errors 0 (+0)`
-- Entity dedup backlog: `210,932` remaining of `211,222` candidate pairs (`0.14%` covered)
+- Entity dedup backlog: `210,936` remaining of `211,226` candidate pairs (`0.14%` covered)
 - Entity dedup review state: `open review 290` (needs_review `87`, proposed_llm `203`); `human-reviewed 0` (accepted `0`, rejected `0`)
 - Relationship drop/reset events recorded today: `0`
 
