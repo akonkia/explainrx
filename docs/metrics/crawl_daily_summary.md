@@ -10,21 +10,20 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ## Latest day
 
-- Snapshot window: `2026-07-23T09:18:58+02:00` to `2026-07-23T09:18:58+02:00` local (`1` snapshots)
-- Intraday coverage: only `1` snapshot was recorded for this day, so snapshot-based same-day deltas are unavailable.
-- Entities in KB: `807,190` (intraday change unavailable: only `1` snapshot; vs prior day `+0`)
-- Relationships in KB: `16,608,149` (intraday gain unavailable: only `1` snapshot; vs prior day `+128`)
-- Entity page crawls exhausted: `185` (`+0` today)
-- Queue backlog: `processing 6 (vs prior day +1)`, `pending 272,873 (vs prior day +11)`, `errors 0 (vs prior day +0)`
-- Entity dedup backlog: `214,455` remaining of `218,735` candidate pairs (`4,280` covered; `1.957%` of current pool)
+- Snapshot window: `2026-07-23T09:18:10+02:00` to `2026-07-23T15:13:42+02:00` local (`69` snapshots)
+- Entities in KB: `809,063` (`+1,873` today)
+- Relationships in KB: `16,664,608` (positive gain `+73,230`, net `+56,459`)
+- Entity page crawls exhausted: `199` (`+14` today)
+- Queue backlog: `processing 1 (-5)`, `pending 278,324 (+5,451)`, `errors 0 (+0)`
+- Entity dedup backlog: `215,118` remaining of `219,398` candidate pairs (`4,280` covered; `1.951%` of current pool)
 - Entity dedup review state: `open review 4,280` (needs_review `1,384`, proposed_llm `2,896`); `human-reviewed 0` (accepted `0`, rejected `0`)
-- Relationship drop/reset events recorded today: `0`
+- Relationship drop/reset events recorded today: `3`
 
 ## Recent days
 
 | Date | Edges in KB | Positive gain | Entities in KB | Completed | Pending | Notes |
 |---|---:|---:|---:|---:|---:|---|
-| 2026-07-23 | 16,608,149 | — | 807,190 | 185 | 272,873 | 1 snapshot only |
+| 2026-07-23 | 16,664,608 | +73,230 | 809,063 | 199 | 278,324 | 3 drop/reset day |
 | 2026-07-22 | 16,608,021 | +234,579 | 807,190 | 185 | 272,862 | 14 drop/reset day |
 | 2026-07-21 | 16,478,273 | +189,225 | 796,229 | 182 | 240,513 | 7 drop/reset day |
 | 2026-07-19 | 16,453,466 | +46,156 | 787,462 | 168 | 208,578 | 1 drop/reset day |
