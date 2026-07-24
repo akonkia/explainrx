@@ -10,20 +10,20 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ## Latest day
 
-- Snapshot window: `2026-07-24T09:25:17+02:00` to `2026-07-24T21:14:28+02:00` local (`77` snapshots)
-- Entities in KB: `820,526` (`+8,549` today)
-- Relationships in KB: `16,655,199` (positive gain `+190,446`, net `-53,196`)
+- Snapshot window: `2026-07-24T09:25:17+02:00` to `2026-07-24T22:14:52+02:00` local (`90` snapshots)
+- Entities in KB: `820,741` (`+8,764` today)
+- Relationships in KB: `16,662,315` (positive gain `+206,814`, net `-46,080`)
 - Entity page crawls exhausted: `215` (`+16` today)
-- Queue backlog: `processing 16 (+10)`, `pending 303,976 (+18,180)`, `errors 0 (+0)`
-- Entity dedup backlog: `217,354` remaining of `221,634` candidate pairs (`4,280` covered; `1.931%` of current pool)
+- Queue backlog: `processing 12 (+6)`, `pending 305,229 (+19,433)`, `errors 0 (+0)`
+- Entity dedup backlog: `217,550` remaining of `221,830` candidate pairs (`4,280` covered; `1.929%` of current pool)
 - Entity dedup review state: `open review 4,280` (needs_review `1,384`, proposed_llm `2,896`); `human-reviewed 0` (accepted `0`, rejected `0`)
-- Relationship drop/reset events recorded today: `23`
+- Relationship drop/reset events recorded today: `24`
 
 ## Recent days
 
 | Date | Edges in KB | Positive gain | Entities in KB | Completed | Pending | Notes |
 |---|---:|---:|---:|---:|---:|---|
-| 2026-07-24 | 16,655,199 | +190,446 | 820,526 | 215 | 303,976 | 23 drop/reset day |
+| 2026-07-24 | 16,662,315 | +206,814 | 820,741 | 215 | 305,229 | 24 drop/reset day |
 | 2026-07-23 | 16,704,875 | +190,963 | 811,911 | 199 | 285,786 | 8 drop/reset day |
 | 2026-07-22 | 16,608,021 | +234,579 | 807,190 | 185 | 272,862 | 14 drop/reset day |
 | 2026-07-21 | 16,478,273 | +189,225 | 796,229 | 182 | 240,513 | 7 drop/reset day |
