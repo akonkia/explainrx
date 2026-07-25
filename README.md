@@ -25,7 +25,7 @@ Latest daily summary: [docs/metrics/crawl_daily_summary.md](docs/metrics/crawl_d
 <!-- CRAWL_PROGRESS:START -->
 Latest daily summary: [docs/metrics/crawl_daily_summary.md](docs/metrics/crawl_daily_summary.md)
 
-Latest rollup day: **2026-07-24**
+Latest rollup day: **2026-07-25**
 
 Source: **shared Pi crawl via agnes@192.168.1.22**
 
@@ -34,26 +34,26 @@ Display baseline: **2026-06-24 onward**. Earlier days are excluded because they 
 
 ### Latest day
 
-- Snapshot window: `2026-07-24T09:25:17+02:00` to `2026-07-24T22:14:52+02:00` local (`90` snapshots)
-- Entities in KB: `820,741` (`+8,764` today)
-- Relationships in KB: `16,662,315` (positive gain `+206,814`, net `-46,080`)
-- Entity page crawls exhausted: `215` (`+16` today)
-- Queue backlog: `processing 12 (+6)`, `pending 305,229 (+19,433)`, `errors 0 (+0)`
-- Entity dedup backlog: `217,550` remaining of `221,830` candidate pairs (`4,280` covered; `1.929%` of current pool)
+- Snapshot window: `2026-07-25T10:42:41+02:00` to `2026-07-25T12:32:29+02:00` local (`13` snapshots)
+- Entities in KB: `822,093` (`+1,347` today)
+- Relationships in KB: `16,658,703` (positive gain `+48,245`, net `+48,188`)
+- Entity page crawls exhausted: `215` (`+0` today)
+- Queue backlog: `processing 10 (+0)`, `pending 305,231 (+0)`, `errors 0 (+0)`
+- Entity dedup backlog: `217,985` remaining of `222,265` candidate pairs (`4,280` covered; `1.926%` of current pool)
 - Entity dedup review state: `open review 4,280` (needs_review `1,384`, proposed_llm `2,896`); `human-reviewed 0` (accepted `0`, rejected `0`)
-- Relationship drop/reset events recorded today: `24`
+- Relationship drop/reset events recorded today: `1`
 
 ### Recent days
 
 | Date | Edges in KB | Positive gain | Entities in KB | Completed | Pending | Notes |
 |---|---:|---:|---:|---:|---:|---|
-| 2026-07-24 | 16,662,315 | +206,814 | 820,741 | 215 | 305,229 | 24 drop/reset day |
+| 2026-07-25 | 16,658,703 | +48,245 | 822,093 | 215 | 305,231 | 1 drop/reset day |
+| 2026-07-24 | 16,663,830 | +208,534 | 820,746 | 215 | 305,232 | 24 drop/reset day |
 | 2026-07-23 | 16,704,875 | +190,963 | 811,911 | 199 | 285,786 | 8 drop/reset day |
 | 2026-07-22 | 16,608,021 | +234,579 | 807,190 | 185 | 272,862 | 14 drop/reset day |
 | 2026-07-21 | 16,478,273 | +189,225 | 796,229 | 182 | 240,513 | 7 drop/reset day |
 | 2026-07-19 | 16,453,466 | +46,156 | 787,462 | 168 | 208,578 | 1 drop/reset day |
 | 2026-07-18 | 16,403,798 | +253,232 | 785,719 | 163 | 200,514 | 4 drop/reset day |
-| 2026-07-17 | 16,226,247 | +21,204 | 776,239 | 157 | 154,125 | 5 drop/reset day |
 
 Generated from `crawl_daily_progress.csv`.
 <!-- CRAWL_PROGRESS:END -->
